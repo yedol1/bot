@@ -37,7 +37,210 @@ app.message("hello", async ({ message, say }) => {
 app.action("button_click", async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
-  await say(`<@${body.user.id}> clicked the button`);
+  await say({
+    type: "modal",
+    submit: {
+      type: "plain_text",
+      text: "Submit",
+      emoji: true,
+    },
+    close: {
+      type: "plain_text",
+      text: "Cancel",
+      emoji: true,
+    },
+    title: {
+      type: "plain_text",
+      text: "QA 리포트 작성",
+      emoji: true,
+    },
+    blocks: [
+      {
+        type: "context",
+        elements: [
+          {
+            type: "plain_text",
+            text: "리포트 작성",
+            emoji: true,
+          },
+        ],
+      },
+      {
+        dispatch_action: true,
+        type: "input",
+        element: {
+          type: "plain_text_input",
+          dispatch_action_config: {
+            trigger_actions_on: ["on_character_entered"],
+          },
+          action_id: "plain_text_input-action",
+        },
+        label: {
+          type: "plain_text",
+          text: "제목",
+          emoji: true,
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Test block with users select",
+        },
+        accessory: {
+          type: "users_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select a user",
+            emoji: true,
+          },
+          action_id: "users_select-action",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Test block with users select",
+        },
+        accessory: {
+          type: "users_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select a user",
+            emoji: true,
+          },
+          action_id: "users_select-action",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Pick an item from the dropdown list",
+        },
+        accessory: {
+          type: "static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select an item",
+            emoji: true,
+          },
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 0*",
+                emoji: true,
+              },
+              value: "value-0",
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 1*",
+                emoji: true,
+              },
+              value: "value-1",
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 2*",
+                emoji: true,
+              },
+              value: "value-2",
+            },
+          ],
+          action_id: "static_select-action",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Pick an item from the dropdown list",
+        },
+        accessory: {
+          type: "static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select an item",
+            emoji: true,
+          },
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 0*",
+                emoji: true,
+              },
+              value: "value-0",
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 1*",
+                emoji: true,
+              },
+              value: "value-1",
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 2*",
+                emoji: true,
+              },
+              value: "value-2",
+            },
+          ],
+          action_id: "static_select-action",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Pick an item from the dropdown list",
+        },
+        accessory: {
+          type: "static_select",
+          placeholder: {
+            type: "plain_text",
+            text: "Select an item",
+            emoji: true,
+          },
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 0*",
+                emoji: true,
+              },
+              value: "value-0",
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 1*",
+                emoji: true,
+              },
+              value: "value-1",
+            },
+            {
+              text: {
+                type: "plain_text",
+                text: "*plain_text option 2*",
+                emoji: true,
+              },
+              value: "value-2",
+            },
+          ],
+          action_id: "static_select-action",
+        },
+      },
+    ],
+  });
 });
 
 (async () => {

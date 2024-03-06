@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node main.js"
+  },
   "dependencies": {
     "@notionhq/client": "^2.2.14",
     "@slack/bolt": "^3.17.1",
