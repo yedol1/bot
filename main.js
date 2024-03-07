@@ -103,7 +103,7 @@ app.command("/qa-add", async ({ body, ack, client }) => {
   // Acknowledge the action
   await ack();
   try {
-    await client.views.open({
+    const res = await client.views.open({
       trigger_id: body.trigger_id,
       view: {
         type: "modal",
@@ -331,12 +331,9 @@ app.command("/qa-add", async ({ body, ack, client }) => {
         },
       },
     });
+    return res;
   } catch (error) {
     console.error("슬랙 창 열기 실패:", error);
-    // await client.chat.postMessage({
-    //   channel: body.user_id,
-    //   text: "슬랙 모달창에 문제가 생겼어요😵 다시 시도해주세용!",
-    // });
   }
 });
 const developer = {
@@ -344,10 +341,11 @@ const developer = {
   U042RS7CBU6: "김재호",
   U05CWRU2K60: "정태현",
 };
-// 모달창에서 submit 버튼을 클릭하면, 입력한 내용을 채팅을 통해 보내는 부분입니다.
+
+//
 app.view("uploadBlog", async ({ ack, body, view, client, say }) => {
+  if (view.private_metadata !== "C06N992QPD3") return new Error("해당 채널에서는 사용할 수 없는 명령어입니다. ");
   await ack();
-  console.log("view:", view.state.values);
   const channelID = view.private_metadata;
   const values = view.state.values;
   const report = values["report_text_input"]["report_text_input-action"].value;
@@ -358,13 +356,23 @@ app.view("uploadBlog", async ({ ack, body, view, client, say }) => {
   const bug = values["bug_select"]["bug_select-action"].selected_option.text.text;
 
   try {
-    const notionData = await addItemToDatabase(report, header, author, developerName, bug);
-    const messageText = `*[ QA 리포트가 제출되었습니다! ]*\n\n\n*⚒️ 기능영역:* ${report}\n\n*📝 문제요약:* ${header}\n\n*🙋‍♀️ 버그 리포트 작성자:* ${author}\n\n*🧑‍💻 개발 담당자:* <@${developer_ID}>\n\n*🐞 버그 유형:* ${bug}\n\n\n*📎 링크*: ${notionData.url}`;
-    if (notionData) {
+    // 채널이 'C06N992QPD3' 와 다르면 에러 발생
+    if (channelID !== "C06N992QPD3") {
       await client.chat.postMessage({
-        channel: channelID, // 추출한 채널 ID 사용
-        text: messageText,
+        channel: channelID,
+        text: "해당 채널에서는 사용할 수 없는 명령어입니다. ",
       });
+      return new Error("해당 채널에서는 사용할 수 없는 명령어입니다. ");
+    } else {
+      const notionData = await addItemToDatabase(report, header, author, developerName, bug);
+      const messageText = `*[ QA 리포트가 제출되었습니다! ]*\n\n\n*⚒️ 기능영역:* ${report}\n\n*📝 문제요약:* ${header}\n\n*🙋‍♀️ 버그 리포트 작성자:* ${author}\n\n*🧑‍💻 개발 담당자:* <@${developer_ID}>\n\n*🐞 버그 유형:* ${bug}\n\n\n*📎 링크*: ${notionData.url}`;
+
+      if (notionData) {
+        await client.chat.postMessage({
+          channel: channelID, // 추출한 채널 ID 사용
+          text: messageText,
+        });
+      }
     }
   } catch (error) {
     console.error("Notion 데이터 추가 실패:", error);
