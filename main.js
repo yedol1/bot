@@ -46,6 +46,121 @@ const bugData = {
     color: "green",
   },
 };
+async function addItemToAttendanceDatabase(user, location) {
+  const queryResponse = await notion.databases.query({
+    database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
+    filter: {
+      and: [
+        {
+          property: "Name",
+          title: {
+            equals: user,
+          },
+        },
+        {
+          property: "날짜",
+          date: {
+            equals: new Date().toISOString().slice(0, 10),
+          },
+        },
+      ],
+    },
+  });
+  if (queryResponse.results.length > 0) {
+    console.log("이미 출근한 사용자입니다.");
+    return queryResponse.results.length;
+  }
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID },
+      properties: {
+        // Name 속성 유형은 제목입니다.
+        Name: {
+          title: [
+            {
+              text: {
+                content: user,
+              },
+            },
+          ],
+        },
+        // Date 속성 유형은 날짜입니다.
+        날짜: {
+          date: {
+            start: new Date().toISOString().slice(0, 10),
+          },
+        },
+        // Attendance 속성 유형은 상태입니다.
+        상태: {
+          status: {
+            name: "출근",
+          },
+        },
+        // 출근지의 속성 유형은 텍스트입니다.
+        동선: {
+          type: "rich_text",
+          rich_text: [
+            {
+              text: {
+                content: location,
+              },
+            },
+          ],
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
+async function changeStatusToAttendanceDatabase(user, date) {
+  const queryResponse = await notion.databases.query({
+    database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
+    filter: {
+      and: [
+        {
+          property: "Name",
+          title: {
+            equals: user,
+          },
+        },
+        {
+          property: "날짜",
+          date: {
+            equals: date,
+          },
+        },
+        {
+          property: "상태",
+          status: {
+            equals: "출근",
+          },
+        },
+      ],
+    },
+  });
+
+  try {
+    // notion api를 사용하여 데이터베이스에 접근하여, 받아온 user, date, status 값과 일치하는 데이터를 찾아 상태를 변경합니다.
+    const response = await notion.pages.update({
+      page_id: queryResponse.results[0].id,
+      properties: {
+        // Attendance 속성 유형은 상태입니다.
+        상태: {
+          status: {
+            name: "퇴근",
+          },
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
 async function addItemToDatabase(report, header, author, developerName, bug) {
   try {
     const response = await notion.pages.create({
@@ -341,7 +456,306 @@ const developer = {
   U042RS7CBU6: "김재호",
   U05CWRU2K60: "정태현",
 };
+app.command("/check-in", async ({ ack, body, client }) => {
+  await ack();
+  try {
+    const res = await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        type: "modal",
+        callback_id: "checkIn",
+        private_metadata: body.channel_id,
+        title: {
+          type: "plain_text",
+          text: "출근자 선택",
+        },
+        blocks: [
+          {
+            type: "section",
+            block_id: "check_in_select",
+            text: {
+              type: "mrkdwn",
+              text: "출근 체크",
+            },
+            accessory: {
+              type: "static_select",
+              placeholder: {
+                type: "plain_text",
+                text: "선택하기",
+                emoji: true,
+              },
+              options: [
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "박경호",
+                    emoji: true,
+                  },
+                  value: "박경호",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "이광렬",
+                    emoji: true,
+                  },
+                  value: "이광렬",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "강인해",
+                    emoji: true,
+                  },
+                  value: "강인해",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "김재호",
+                    emoji: true,
+                  },
+                  value: "김재호",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "정태현",
+                    emoji: true,
+                  },
+                  value: "정태현",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "김태원",
+                    emoji: true,
+                  },
+                  value: "김태원",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "유희경",
+                    emoji: true,
+                  },
+                  value: "유희경",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "임재림",
+                    emoji: true,
+                  },
+                  value: "임재림",
+                },
+              ],
+              action_id: "check_in_select-action",
+            },
+          },
+          {
+            dispatch_action: true,
+            type: "input",
+            block_id: "header_text_input",
+            element: {
+              type: "plain_text_input",
+              dispatch_action_config: {
+                trigger_actions_on: ["on_character_entered"],
+              },
+              action_id: "header_text_input-action",
+            },
+            label: {
+              type: "plain_text",
+              text: "출근지",
+              emoji: true,
+            },
+          },
+        ],
+        submit: {
+          type: "plain_text",
+          text: "Submit",
+        },
+      },
+    });
+    return res;
+  } catch (error) {
+    console.error("슬랙 창 열기 실패:", error);
+  }
+});
+app.view("checkIn", async ({ ack, body, view, client }) => {
+  await ack();
+  const channelID = view.private_metadata;
+  const values = view.state.values;
+  const user = values["check_in_select"]["check_in_select-action"].selected_option.text.text;
+  const time = new Date().toLocaleTimeString("ko-KR", {
+    timeZone: "Asia/Seoul",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const location = values["header_text_input"]["header_text_input-action"].value;
 
+  const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
+
+  const notionData = await addItemToAttendanceDatabase(user, location);
+
+  if (notionData) {
+    if (typeof notionData === "number") {
+      await client.chat.postMessage({
+        channel: body.user.id,
+        text: "이미 출근한 사용자입니다. ",
+      });
+      return;
+    }
+    try {
+      await client.chat.postMessage({
+        channel: channelID,
+        text: messageText,
+      });
+    } catch (error) {
+      console.error("메시지 전송 실패:", error);
+    }
+  }
+});
+app.command("/check-out", async ({ ack, body, client }) => {
+  await ack();
+  try {
+    const res = await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        type: "modal",
+        callback_id: "checkOut",
+        private_metadata: body.channel_id,
+        title: {
+          type: "plain_text",
+          text: "퇴근자 선택",
+        },
+        blocks: [
+          {
+            type: "section",
+            block_id: "check_out_select",
+            text: {
+              type: "mrkdwn",
+              text: "퇴근 체크",
+            },
+            accessory: {
+              type: "static_select",
+              placeholder: {
+                type: "plain_text",
+                text: "선택하기",
+                emoji: true,
+              },
+              options: [
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "박경호",
+                    emoji: true,
+                  },
+                  value: "박경호",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "이광렬",
+                    emoji: true,
+                  },
+                  value: "이광렬",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "강인해",
+                    emoji: true,
+                  },
+                  value: "강인해",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "김재호",
+                    emoji: true,
+                  },
+                  value: "김재호",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "정태현",
+                    emoji: true,
+                  },
+                  value: "정태현",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "김태원",
+                    emoji: true,
+                  },
+                  value: "김태원",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "유희경",
+                    emoji: true,
+                  },
+                  value: "유희경",
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "임재림",
+                    emoji: true,
+                  },
+                  value: "임재림",
+                },
+              ],
+              action_id: "check_out_select-action",
+            },
+          },
+        ],
+        submit: {
+          type: "plain_text",
+          text: "Submit",
+        },
+      },
+    });
+    return res;
+  } catch (error) {
+    console.error("슬랙 창 열기 실패:", error);
+  }
+});
+app.view("checkOut", async ({ ack, body, view, client }) => {
+  await ack();
+  const channelID = view.private_metadata;
+  const values = view.state.values;
+  const user = values["check_out_select"]["check_out_select-action"].selected_option.text.text;
+  const time = new Date().toLocaleTimeString("ko-KR", {
+    timeZone: "Asia/Seoul",
+    hour: "2-digit",
+    minute: "2-digit",
+    // 초는 제외합니다.
+  });
+
+  const messageText = `:woman-raising-hand: [퇴근] ${user} ( ${time} )`;
+  const notionData = await changeStatusToAttendanceDatabase(user, new Date().toISOString().slice(0, 10), channelID, client);
+  if (notionData) {
+    try {
+      await client.chat.postMessage({
+        channel: channelID,
+        text: messageText,
+      });
+    } catch (error) {
+      console.error("메시지 전송 실패:", error);
+    }
+  } else {
+    // 에러 발생시 개인 DM으로 에러 메시지 전송
+    await client.chat.postMessage({
+      channel: body.user.id,
+      text: "퇴근 체크에 실패했어요😵 다시 확인후 시도해주세요!",
+    });
+  }
+});
 //
 app.view("uploadBlog", async ({ ack, body, view, client, say }) => {
   if (view.private_metadata !== "C06N992QPD3") return new Error("해당 채널에서는 사용할 수 없는 명령어입니다. ");
