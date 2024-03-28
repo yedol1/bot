@@ -1,5 +1,6 @@
 const { notion } = require("../config");
 const { authorData, bugData } = require("../data");
+const { getSeoulDateISOString } = require("../utils");
 
 async function addItemToVacationDatabase(user, startDate, endDate, totalVacationDays) {
   try {
@@ -42,6 +43,7 @@ async function addItemToVacationDatabase(user, startDate, endDate, totalVacation
 }
 
 async function addItemToAttendanceDatabase(user, location) {
+  const date = getSeoulDateISOString();
   const queryResponse = await notion.databases.query({
     database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
     filter: {
@@ -55,7 +57,7 @@ async function addItemToAttendanceDatabase(user, location) {
         {
           property: "날짜",
           date: {
-            equals: new Date().toISOString().slice(0, 10),
+            equals: date.slice(0, 10),
           },
         },
       ],
@@ -81,7 +83,7 @@ async function addItemToAttendanceDatabase(user, location) {
         // Date 속성 유형은 날짜입니다.
         날짜: {
           date: {
-            start: new Date().toISOString().slice(0, 10),
+            start: date.slice(0, 10),
           },
         },
         // Attendance 속성 유형은 상태입니다.

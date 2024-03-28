@@ -1,5 +1,6 @@
 const { app } = require("../config");
 const { addItemToAttendanceDatabase, changeStatusToAttendanceDatabase, addItemToDatabase, addItemToVacationDatabase } = require("../notion/notionAPI");
+const { getSeoulDateISOString } = require("../utils");
 
 function setupSlackViews() {
   app.view("checkIn", async ({ ack, body, view, client }) => {
@@ -49,7 +50,8 @@ function setupSlackViews() {
     });
 
     const messageText = `:woman-raising-hand: [퇴근] ${user} ( ${time} )`;
-    const notionData = await changeStatusToAttendanceDatabase(user, new Date().toISOString().slice(0, 10), channelID, client);
+    const date = getSeoulDateISOString();
+    const notionData = await changeStatusToAttendanceDatabase(user, date.slice(0, 10), channelID, client);
     if (notionData) {
       try {
         await client.chat.postMessage({

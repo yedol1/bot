@@ -331,6 +331,14 @@ function setupSlackCommands() {
                     },
                     value: "임재림",
                   },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "test",
+                      emoji: true,
+                    },
+                    value: "test",
+                  },
                 ],
                 action_id: "check_in_select-action",
               },
@@ -456,6 +464,14 @@ function setupSlackCommands() {
                       emoji: true,
                     },
                     value: "임재림",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "test",
+                      emoji: true,
+                    },
+                    value: "test",
                   },
                 ],
                 action_id: "check_out_select-action",
