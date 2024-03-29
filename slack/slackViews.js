@@ -124,6 +124,14 @@ function setupSlackViews() {
       values["request_vacation_select-start"]["request_vacation_select-action"].selected_date,
       values["request_vacation_select-end"]["request_vacation_select-action"].selected_date,
     ];
+    // startDate 보다 endDate가 더 빠른 경우, 개인 DM으로 에러 메시지 전송
+    if (new Date(startDate) > new Date(endDate)) {
+      await client.chat.postMessage({
+        channel: body.user.id,
+        text: "휴가 시작일이 종료일보다 늦습니다. 다시 확인 후 시도해주세요!",
+      });
+      return;
+    }
     const totalVacationDays = Math.round((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
     const notionData = await addItemToVacationDatabase(user, startDate, endDate, totalVacationDays);
     if (notionData) {

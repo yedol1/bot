@@ -334,6 +334,22 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
+                      text: "이종원",
+                      emoji: true,
+                    },
+                    value: "이종원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "조문근",
+                      emoji: true,
+                    },
+                    value: "조문근",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
                       text: "test",
                       emoji: true,
                     },
@@ -468,6 +484,22 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
+                      text: "이종원",
+                      emoji: true,
+                    },
+                    value: "이종원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "조문근",
+                      emoji: true,
+                    },
+                    value: "조문근",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
                       text: "test",
                       emoji: true,
                     },
@@ -581,6 +613,22 @@ function setupSlackCommands() {
                       emoji: true,
                     },
                     value: "임재림",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "이종원",
+                      emoji: true,
+                    },
+                    value: "이종원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "조문근",
+                      emoji: true,
+                    },
+                    value: "조문근",
                   },
                 ],
                 action_id: "vacation_person_select-action",
