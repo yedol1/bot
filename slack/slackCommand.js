@@ -509,6 +509,23 @@ function setupSlackCommands() {
                 action_id: "check_out_select-action",
               },
             },
+            {
+              type: "section",
+              block_id: "check_out_date_select",
+              text: {
+                type: "mrkdwn",
+                text: "퇴근 날짜 선택 (출근 날짜와 동일하지 않을 경우 입력)",
+              },
+              accessory: {
+                type: "datepicker",
+                placeholder: {
+                  type: "plain_text",
+                  text: "퇴근 날짜 선택",
+                  emoji: true,
+                },
+                action_id: "check_out_date_select-action",
+              },
+            },
           ],
           submit: {
             type: "plain_text",

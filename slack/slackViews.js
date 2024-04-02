@@ -1,5 +1,5 @@
 const { app } = require("../config");
-const { addItemToAttendanceDatabase, changeStatusToAttendanceDatabase, addItemToDatabase, addItemToVacationDatabase } = require("../notion/notionAPI");
+const { addItemToDatabase, addItemToVacationDatabase, checkInAttendanceDatabase, checkOutAttendanceDatabase } = require("../notion/notionAPI");
 const { getSeoulDateISOString } = require("../utils");
 
 function setupSlackViews() {
@@ -17,7 +17,7 @@ function setupSlackViews() {
 
     const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
 
-    const notionData = await addItemToAttendanceDatabase(user, location);
+    const notionData = await checkInAttendanceDatabase(user, location);
 
     if (notionData) {
       if (typeof notionData === "number") {
@@ -48,10 +48,11 @@ function setupSlackViews() {
       minute: "2-digit",
       // 초는 제외합니다.
     });
+    const selectedDate = values["check_out_date_select"]["check_out_date_select-action"].selected_date;
 
     const messageText = `:woman-raising-hand: [퇴근] ${user} ( ${time} )`;
     const date = getSeoulDateISOString();
-    const notionData = await changeStatusToAttendanceDatabase(user, date.slice(0, 10), channelID, client);
+    const notionData = await checkOutAttendanceDatabase(user, date.slice(0, 10), selectedDate);
     if (notionData) {
       try {
         await client.chat.postMessage({

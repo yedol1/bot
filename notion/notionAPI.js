@@ -42,7 +42,7 @@ async function addItemToVacationDatabase(user, startDate, endDate, totalVacation
   }
 }
 
-async function addItemToAttendanceDatabase(user, location) {
+async function checkInAttendanceDatabase(user, location) {
   const date = getSeoulDateISOString();
   const queryResponse = await notion.databases.query({
     database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
@@ -112,7 +112,7 @@ async function addItemToAttendanceDatabase(user, location) {
   }
 }
 
-async function changeStatusToAttendanceDatabase(user, date) {
+async function checkOutAttendanceDatabase(user, date, selectDate) {
   const queryResponse = await notion.databases.query({
     database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
     filter: {
@@ -138,12 +138,40 @@ async function changeStatusToAttendanceDatabase(user, date) {
       ],
     },
   });
-
+  if (!queryResponse) return new Error("데이터베이스에 접근할 수 없습니다.");
   try {
     // notion api를 사용하여 데이터베이스에 접근하여, 받아온 user, date, status 값과 일치하는 데이터를 찾아 상태를 변경합니다.
-    const response = await notion.pages.update({
-      page_id: queryResponse.results[0].id,
+    // const response = await notion.pages.update({
+    //   page_id: queryResponse.results[0].id,
+    //   properties: {
+    //     // Attendance 속성 유형은 상태입니다.
+    //     상태: {
+    //       status: {
+    //         name: "퇴근",
+    //       },
+    //     },
+    //   },
+    // });
+    // 퇴근 체크를 위해 notion api를 사용하여 데이터베이스에 접근하여, 받아온 user, selectDate 값을 넣어 데이터를 추가합니다.
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID },
       properties: {
+        // Name 속성 유형은 제목입니다.
+        Name: {
+          title: [
+            {
+              text: {
+                content: user,
+              },
+            },
+          ],
+        },
+        // Date 속성 유형은 날짜입니다.
+        날짜: {
+          date: {
+            start: selectDate || date,
+          },
+        },
         // Attendance 속성 유형은 상태입니다.
         상태: {
           status: {
@@ -214,8 +242,8 @@ async function addItemToDatabase(report, header, author, developerName, bug) {
 }
 
 module.exports = {
-  addItemToAttendanceDatabase,
-  changeStatusToAttendanceDatabase,
+  checkInAttendanceDatabase,
+  checkOutAttendanceDatabase,
   addItemToDatabase,
   addItemToVacationDatabase,
 };
