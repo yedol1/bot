@@ -257,7 +257,7 @@ function setupSlackCommands() {
               block_id: "check_in_select",
               text: {
                 type: "mrkdwn",
-                text: "출근 체크",
+                text: "✅ 출근 체크",
               },
               accessory: {
                 type: "static_select",
@@ -359,6 +359,24 @@ function setupSlackCommands() {
                 action_id: "check_in_select-action",
               },
             },
+            // 선택해도 되고 안해도 되는 부분
+            {
+              type: "section",
+              block_id: "check_in_timepicker",
+              text: {
+                type: "mrkdwn",
+                text: "⚠️ 출근 시간 선택 (현재 시간이 아닐 경우 입력)",
+              },
+              accessory: {
+                type: "timepicker",
+                placeholder: {
+                  type: "plain_text",
+                  text: "ex) 1550 === 15:50",
+                  emoji: true,
+                },
+                action_id: "check_in_timepicker-action",
+              },
+            },
             {
               dispatch_action: true,
               type: "input",
@@ -377,6 +395,7 @@ function setupSlackCommands() {
               },
             },
           ],
+
           submit: {
             type: "plain_text",
             text: "Submit",
@@ -407,7 +426,7 @@ function setupSlackCommands() {
               block_id: "check_out_select",
               text: {
                 type: "mrkdwn",
-                text: "퇴근 체크",
+                text: "✅ 퇴근 체크",
               },
               accessory: {
                 type: "static_select",
@@ -510,11 +529,44 @@ function setupSlackCommands() {
               },
             },
             {
+              type: "rich_text",
+              elements: [
+                {
+                  type: "rich_text_section",
+                  elements: [
+                    {
+                      type: "text",
+                      text: "⚠️ 퇴근 시간이 현 시간이 아닐 경우 입력해주세요.",
+                    },
+                  ],
+                },
+              ],
+            },
+            // 선택해도 되고 안해도 되는 부분
+
+            {
+              type: "section",
+              block_id: "check_in_date_select",
+              text: {
+                type: "mrkdwn",
+                text: "출근 날짜 선택",
+              },
+              accessory: {
+                type: "datepicker",
+                placeholder: {
+                  type: "plain_text",
+                  text: "출근 날짜 선택",
+                  emoji: true,
+                },
+                action_id: "check_in_date_select-action",
+              },
+            },
+            {
               type: "section",
               block_id: "check_out_date_select",
               text: {
                 type: "mrkdwn",
-                text: "퇴근 날짜 선택 (출근 날짜와 동일하지 않을 경우 입력)",
+                text: "퇴근 날짜 선택",
               },
               accessory: {
                 type: "datepicker",
@@ -524,6 +576,23 @@ function setupSlackCommands() {
                   emoji: true,
                 },
                 action_id: "check_out_date_select-action",
+              },
+            },
+            {
+              type: "section",
+              block_id: "check_out_timepicker",
+              text: {
+                type: "mrkdwn",
+                text: "퇴근 시간 선택",
+              },
+              accessory: {
+                type: "timepicker",
+                placeholder: {
+                  type: "plain_text",
+                  text: "ex) 1550 === 15:50",
+                  emoji: true,
+                },
+                action_id: "check_out_timepicker-action",
               },
             },
           ],
@@ -538,6 +607,225 @@ function setupSlackCommands() {
       console.error("슬랙 창 열기 실패:", error);
     }
   });
+  app.command("/request-attendance-fix", async ({ ack, body, client }) => {
+    await ack();
+    try {
+      const res = await client.views.open({
+        trigger_id: body.trigger_id,
+        view: {
+          type: "modal",
+          callback_id: "requestAttendanceFix",
+          private_metadata: body.channel_id,
+          title: {
+            type: "plain_text",
+            text: "근태 수정 신청",
+          },
+          blocks: [
+            {
+              type: "section",
+              block_id: "attendance_fix_person_select",
+              text: {
+                type: "mrkdwn",
+                text: "근태 수정자 선택",
+              },
+              accessory: {
+                type: "static_select",
+                placeholder: {
+                  type: "plain_text",
+                  text: "선택하기",
+                  emoji: true,
+                },
+                options: [
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "박경호",
+                      emoji: true,
+                    },
+                    value: "박경호",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "이광렬",
+                      emoji: true,
+                    },
+                    value: "이광렬",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "강인해",
+                      emoji: true,
+                    },
+                    value: "강인해",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "김재호",
+                      emoji: true,
+                    },
+                    value: "김재호",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "정태현",
+                      emoji: true,
+                    },
+                    value: "정태현",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "김태원",
+                      emoji: true,
+                    },
+                    value: "김태원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "유희경",
+                      emoji: true,
+                    },
+                    value: "유희경",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "임재림",
+                      emoji: true,
+                    },
+                    value: "임재림",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "이종원",
+                      emoji: true,
+                    },
+                    value: "이종원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "조문근",
+                      emoji: true,
+                    },
+                    value: "조문근",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "test",
+                      emoji: true,
+                    },
+                    value: "test",
+                  },
+                ],
+                action_id: "attendance_fix_person_select-action",
+              },
+            },
+            {
+              type: "section",
+              block_id: "attendance_fix_date_select",
+              text: {
+                type: "mrkdwn",
+                text: "근태 수정 날짜 선택",
+              },
+              accessory: {
+                type: "datepicker",
+                placeholder: {
+                  type: "plain_text",
+                  text: "날짜 선택",
+                  emoji: true,
+                },
+                action_id: "attendance_fix_date_select-action",
+              },
+            },
+            // 수정할 근태 상태 선택
+            {
+              type: "section",
+              block_id: "attendance_fix_status_select",
+              text: {
+                type: "mrkdwn",
+                text: "수정할 근태 상태 선택",
+              },
+              accessory: {
+                type: "static_select",
+                placeholder: {
+                  type: "plain_text",
+                  text: "선택하기",
+                  emoji: true,
+                },
+                options: [
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "출근",
+                      emoji: true,
+                    },
+                    value: "출근",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "퇴근",
+                      emoji: true,
+                    },
+                    value: "퇴근",
+                  },
+                ],
+                action_id: "attendance_fix_status_select-action",
+              },
+            },
+            // 수정한 근태 날짜 선택
+            {
+              type: "section",
+              block_id: "attendance_fix_time_select",
+              text: {
+                type: "mrkdwn",
+                text: "수정한 근태 시간 선택",
+              },
+              accessory: {
+                type: "timepicker",
+                placeholder: {
+                  type: "plain_text",
+                  text: "시간 선택",
+                  emoji: true,
+                },
+                action_id: "attendance_fix_time_select-action",
+              },
+            },
+
+            // 근태 수정 사유 입력
+            {
+              type: "input",
+              block_id: "attendance_fix_reason_input",
+              element: {
+                type: "plain_text_input",
+                multiline: true,
+              },
+              label: {
+                type: "plain_text",
+                text: "근태 수정 사유",
+              },
+            },
+          ],
+          submit: {
+            type: "plain_text",
+            text: "Submit",
+          },
+        },
+      });
+      return res;
+    } catch (error) {
+      console.error("슬랙 창 열기 실패:", error);
+    }
+  });
+
   app.command("/request-vacation", async ({ ack, body, client }) => {
     await ack();
     try {

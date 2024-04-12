@@ -1,29 +1,166 @@
 const { app } = require("../config");
-const { addItemToDatabase, addItemToVacationDatabase, checkInAttendanceDatabase, checkOutAttendanceDatabase } = require("../notion/notionAPI");
+const { addItemToDatabase, addItemToVacationDatabase, checkInAttendanceDatabase, checkOutAttendanceDatabase, updateAttendanceDatabase } = require("../notion/notionAPI");
 const { getSeoulDateISOString } = require("../utils");
 
 function setupSlackViews() {
+  // app.view("checkIn", async ({ ack, body, view, client }) => {
+  //   await ack();
+  //   const channelID = view.private_metadata;
+  //   const values = view.state.values;
+  //   const user = values["check_in_select"]["check_in_select-action"].selected_option.text.text;
+  //   // {
+  //   //   type: "section",
+  //   //   text: {
+  //   //     type: "mrkdwn",
+  //   //     text: "Section block with a timepicker",
+  //   //   },
+  //   //   accessory: {
+  //   //     type: "timepicker",
+  //   //     initial_time: "12:00",
+  //   //     placeholder: {
+  //   //       type: "plain_text",
+  //   //       text: "Select time",
+  //   //       emoji: true,
+  //   //     },
+  //   //     action_id: "timepicker-action",
+  //   //   },
+  //   // },
+  //   const selectedTime = values;
+  //   console.log("selectedTime", selectedTime);
+  //   const time = new Date().toLocaleTimeString("ko-KR", {
+  //     timeZone: "Asia/Seoul",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   });
+  //   const location = values["header_text_input"]["header_text_input-action"].value;
+
+  //   const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
+
+  //   const notionData = await checkInAttendanceDatabase(user, location);
+
+  //   if (notionData) {
+  //     if (typeof notionData === "number") {
+  //       await client.chat.postMessage({
+  //         channel: body.user.id,
+  //         text: "이미 출근한 사용자입니다. ",
+  //       });
+  //       return;
+  //     }
+  //     try {
+  //       await client.chat.postMessage({
+  //         channel: channelID,
+  //         text: messageText,
+  //       });
+  //     } catch (error) {
+  //       console.error("메시지 전송 실패:", error);
+  //     }
+  //   }
+  // });
   app.view("checkIn", async ({ ack, body, view, client }) => {
     await ack();
     const channelID = view.private_metadata;
     const values = view.state.values;
+
+    console.log("values", values);
+
+    // 사용자 이름 가져오기
     const user = values["check_in_select"]["check_in_select-action"].selected_option.text.text;
-    const time = new Date().toLocaleTimeString("ko-KR", {
+
+    // 타임피커에서 선택한 시간 가져오기
+    const selectedTime = values["check_in_timepicker"]["check_in_timepicker-action"].selected_time;
+
+    let time = null;
+    if (selectedTime) {
+      time = new Date();
+      const [hour, minute] = selectedTime.split(":");
+      time.setHours(parseInt(hour, 10), parseInt(minute, 10), 0);
+    } else {
+      time = new Date();
+    }
+
+    // 출근지 정보 가져오기
+    const location = values["header_text_input"]["header_text_input-action"].value;
+
+    // 메시지 텍스트 구성
+    const messageText = `:wave: [출근] ${user} ( ${time.toLocaleTimeString("ko-KR", {
       timeZone: "Asia/Seoul",
       hour: "2-digit",
       minute: "2-digit",
-    });
-    const location = values["header_text_input"]["header_text_input-action"].value;
+    })} ) - ${location}`;
 
-    const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
-
-    const notionData = await checkInAttendanceDatabase(user, location);
+    // Notion 데이터베이스에 출근 정보 업데이트
+    const notionData = await checkInAttendanceDatabase(user, location, time);
 
     if (notionData) {
       if (typeof notionData === "number") {
         await client.chat.postMessage({
           channel: body.user.id,
-          text: "이미 출근한 사용자입니다. ",
+          text: "이미 출근한 사용자입니다.",
+        });
+        return;
+      }
+      try {
+        // 출근 정보를 슬랙 채널에 메시지로 보내기
+        await client.chat.postMessage({
+          channel: channelID,
+          text: messageText,
+        });
+      } catch (error) {
+        console.error("메시지 전송 실패:", error);
+      }
+    }
+  });
+
+  app.view("checkOut", async ({ ack, body, view, client }) => {
+    await ack();
+    const channelID = view.private_metadata;
+    const values = view.state.values;
+    const user = values["check_out_select"]["check_out_select-action"].selected_option.text.text;
+    // 타임피커에서 선택한 시간 가져오기
+    const checkInDate = values["check_in_date_select"]["check_in_date_select-action"].selected_date;
+    const checkOutDate = values["check_out_date_select"]["check_out_date_select-action"].selected_date;
+    const selectedTime = values["check_out_timepicker"]["check_out_timepicker-action"].selected_time;
+    // 위 세개의 변수는 전부 값이 존재해야하거나 전부값이 존재하지 않아야함
+    if ((checkInDate && checkOutDate && selectedTime) || (!checkInDate && !checkOutDate && !selectedTime)) {
+      console.log(checkInDate, checkOutDate, selectedTime);
+    } else {
+      await client.chat.postMessage({
+        channel: body.user.id,
+        text: "날짜와 시간을 모두 선택하거나 모두 선택하지 않아야합니다.",
+      });
+      return;
+    }
+
+    let curDate = new Date();
+    // 선택한 날짜가 존재하면, 해당 날짜로 설정
+    if (checkOutDate) {
+      curDate = new Date(checkOutDate);
+    }
+
+    // 타임피커에서 선택한 시간이 존재하면, 해당 시간으로 설정
+    if (selectedTime) {
+      const [hour, minute] = selectedTime.split(":");
+      curDate.setHours(parseInt(hour, 10), parseInt(minute, 10), 0);
+    }
+
+    const messageText = `🙋‍♀️ [퇴근] ${user} ( ${
+      // mm-dd
+      curDate.toLocaleDateString("ko-KR", {
+        timeZone: "Asia/Seoul",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    } ${curDate.toLocaleTimeString("ko-KR", {
+      timeZone: "Asia/Seoul",
+      hour: "2-digit",
+      minute: "2-digit",
+    })} )`;
+    const notionData = await checkOutAttendanceDatabase(user, curDate, checkInDate);
+    if (notionData) {
+      if (typeof notionData === "number") {
+        await client.chat.postMessage({
+          channel: body.user.id,
+          text: "이미 퇴근한 사용자입니다.",
         });
         return;
       }
@@ -37,40 +174,6 @@ function setupSlackViews() {
       }
     }
   });
-  app.view("checkOut", async ({ ack, body, view, client }) => {
-    await ack();
-    const channelID = view.private_metadata;
-    const values = view.state.values;
-    const user = values["check_out_select"]["check_out_select-action"].selected_option.text.text;
-    const time = new Date().toLocaleTimeString("ko-KR", {
-      timeZone: "Asia/Seoul",
-      hour: "2-digit",
-      minute: "2-digit",
-      // 초는 제외합니다.
-    });
-    const selectedDate = values["check_out_date_select"]["check_out_date_select-action"].selected_date;
-
-    const messageText = `:woman-raising-hand: [퇴근] ${user} ( ${time} )`;
-    const date = getSeoulDateISOString();
-    const notionData = await checkOutAttendanceDatabase(user, date.slice(0, 10), selectedDate);
-    if (notionData) {
-      try {
-        await client.chat.postMessage({
-          channel: channelID,
-          text: messageText,
-        });
-      } catch (error) {
-        console.error("메시지 전송 실패:", error);
-      }
-    } else {
-      // 에러 발생시 개인 DM으로 에러 메시지 전송
-      await client.chat.postMessage({
-        channel: body.user.id,
-        text: "퇴근 체크에 실패했어요😵 다시 확인후 시도해주세요!",
-      });
-    }
-  });
-  //
 
   app.view("uploadBlog", async ({ ack, body, view, client, say }) => {
     if (view.private_metadata !== "C06N992QPD3") return new Error("해당 채널에서는 사용할 수 없는 명령어입니다. ");
