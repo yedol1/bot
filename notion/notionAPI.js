@@ -1,6 +1,6 @@
 const { notion } = require("../config");
 const { authorData, bugData } = require("../data");
-// const { getSeoulDateISOString } = require("../utils");
+const { getSeoulDateISOString } = require("../utils");
 
 async function addItemToVacationDatabase(user, startDate, endDate, totalVacationDays) {
   try {
@@ -99,7 +99,7 @@ async function checkInAttendanceDatabase(user, location, date) {
         // Date 속성 유형은 날짜입니다.
         날짜: {
           date: {
-            start: date,
+            start: getSeoulDateISOString(date),
           },
         },
         // Attendance 속성 유형은 상태입니다.
