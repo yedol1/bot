@@ -197,9 +197,7 @@ async function checkOutAttendanceDatabase(user, date, checkInDate) {
           rich_text: [
             {
               text: {
-                content: `
-                출근날짜: ${checkInDate ? checkInDate : "출근 기록 없음"}
-                `,
+                content: checkInDate ? `출근날짜: ${checkInDate}` : `출근날짜: ${date}`,
               },
             },
           ],
