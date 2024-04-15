@@ -99,7 +99,7 @@ async function checkInAttendanceDatabase(user, location, date) {
         // Date 속성 유형은 날짜입니다.
         날짜: {
           date: {
-            start: getSeoulDateISOString(date),
+            start: date,
           },
         },
         // Attendance 속성 유형은 상태입니다.

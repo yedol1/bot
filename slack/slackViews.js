@@ -30,9 +30,11 @@ function setupSlackViews() {
     const location = values["header_text_input"]["header_text_input-action"].value;
 
     // 메시지 텍스트 구성
-    const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
-    //
-    const selectedTimeISOString = getSeoulDateISOString(time);
+    const messageText = `:wave: [출근] ${user} ( ${time.toLocaleTimeString("ko-KR", {
+      timeZone: "Asia/Seoul",
+      hour: "2-digit",
+      minute: "2-digit",
+    })} ) - ${location}`;
 
     // Notion 데이터베이스에 출근 정보 업데이트
     const notionData = await checkInAttendanceDatabase(user, location, time);
