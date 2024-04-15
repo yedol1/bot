@@ -52,6 +52,7 @@ async function checkInAttendanceDatabase(user, location, date) {
   const startDate = `${justDate}T00:00:00.000Z`; // 해당 날짜의 시작 시각
   const endDate = `${justDate}T23:59:59.999Z`; // 해당 날짜의 종료 시각
 
+  console.log(startDate, endDate);
   const queryResponse = await notion.databases.query({
     database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
     filter: {
@@ -65,7 +66,7 @@ async function checkInAttendanceDatabase(user, location, date) {
         {
           property: "날짜",
           date: {
-            start: justDate,
+            on_or_after: startDate,
           },
         },
         {
