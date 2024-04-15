@@ -65,8 +65,7 @@ async function checkInAttendanceDatabase(user, location, date) {
         {
           property: "날짜",
           date: {
-            on_or_after: startDate,
-            on_or_before: endDate,
+            start: startDate,
           },
         },
         {
