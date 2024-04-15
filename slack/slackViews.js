@@ -71,6 +71,7 @@ function setupSlackViews() {
 
     let time = null;
     if (selectedTime) {
+      console.log("selectedTime", selectedTime);
       time = new Date();
       const [hour, minute] = selectedTime.split(":");
       time.setHours(parseInt(hour, 10), parseInt(minute, 10), 0);

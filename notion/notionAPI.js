@@ -78,13 +78,10 @@ async function checkInAttendanceDatabase(user, location, date) {
       ],
     },
   });
-
+  console.log("서버:", date);
   if (queryResponse.results.length > 0) {
     return queryResponse.results.length; // 해당 날짜에 이미 데이터가 있다면, 그 수를 반환
   }
-  // date 속성은 대한민국 시간대로 설정되어 있어야 합니다.
-  let seoulDate = new Date(date);
-  seoulDate.setHours(seoulDate.getHours() + 9); // UTC 시간대에서 대한민국 시간대로 변경
   try {
     const response = await notion.pages.create({
       parent: { database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID },
@@ -102,7 +99,7 @@ async function checkInAttendanceDatabase(user, location, date) {
         // Date 속성 유형은 날짜입니다.
         날짜: {
           date: {
-            start: seoulDate,
+            start: date,
           },
         },
         // Attendance 속성 유형은 상태입니다.
