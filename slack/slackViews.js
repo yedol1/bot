@@ -3,59 +3,6 @@ const { addItemToDatabase, addItemToVacationDatabase, checkInAttendanceDatabase,
 const { getSeoulDateISOString } = require("../utils");
 
 function setupSlackViews() {
-  // app.view("checkIn", async ({ ack, body, view, client }) => {
-  //   await ack();
-  //   const channelID = view.private_metadata;
-  //   const values = view.state.values;
-  //   const user = values["check_in_select"]["check_in_select-action"].selected_option.text.text;
-  //   // {
-  //   //   type: "section",
-  //   //   text: {
-  //   //     type: "mrkdwn",
-  //   //     text: "Section block with a timepicker",
-  //   //   },
-  //   //   accessory: {
-  //   //     type: "timepicker",
-  //   //     initial_time: "12:00",
-  //   //     placeholder: {
-  //   //       type: "plain_text",
-  //   //       text: "Select time",
-  //   //       emoji: true,
-  //   //     },
-  //   //     action_id: "timepicker-action",
-  //   //   },
-  //   // },
-  //   const selectedTime = values;
-  //   console.log("selectedTime", selectedTime);
-  //   const time = new Date().toLocaleTimeString("ko-KR", {
-  //     timeZone: "Asia/Seoul",
-  //     hour: "2-digit",
-  //     minute: "2-digit",
-  //   });
-  //   const location = values["header_text_input"]["header_text_input-action"].value;
-
-  //   const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
-
-  //   const notionData = await checkInAttendanceDatabase(user, location);
-
-  //   if (notionData) {
-  //     if (typeof notionData === "number") {
-  //       await client.chat.postMessage({
-  //         channel: body.user.id,
-  //         text: "이미 출근한 사용자입니다. ",
-  //       });
-  //       return;
-  //     }
-  //     try {
-  //       await client.chat.postMessage({
-  //         channel: channelID,
-  //         text: messageText,
-  //       });
-  //     } catch (error) {
-  //       console.error("메시지 전송 실패:", error);
-  //     }
-  //   }
-  // });
   app.view("checkIn", async ({ ack, body, view, client }) => {
     await ack();
     const channelID = view.private_metadata;
@@ -83,11 +30,9 @@ function setupSlackViews() {
     const location = values["header_text_input"]["header_text_input-action"].value;
 
     // 메시지 텍스트 구성
-    const messageText = `:wave: [출근] ${user} ( ${time.toLocaleTimeString("ko-KR", {
-      timeZone: "Asia/Seoul",
-      hour: "2-digit",
-      minute: "2-digit",
-    })} ) - ${location}`;
+    const messageText = `:wave: [출근] ${user} ( ${time} ) - ${location}`;
+    //
+    const selectedTimeISOString = getSeoulDateISOString(time);
 
     // Notion 데이터베이스에 출근 정보 업데이트
     const notionData = await checkInAttendanceDatabase(user, location, time);
