@@ -52,36 +52,36 @@ async function checkInAttendanceDatabase(user, location, date) {
   const startDate = `${justDate}T00:00:00.000Z`; // 해당 날짜의 시작 시각
   const endDate = `${justDate}T23:59:59.999Z`; // 해당 날짜의 종료 시각
 
-  console.log(startDate, endDate);
-  const queryResponse = await notion.databases.query({
-    database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
-    filter: {
-      and: [
-        {
-          property: "Name",
-          title: {
-            equals: user,
-          },
-        },
-        {
-          property: "날짜",
-          date: {
-            on_or_after: startDate,
-          },
-        },
-        {
-          property: "상태",
-          status: {
-            equals: "출근",
-          },
-        },
-      ],
-    },
-  });
-  console.log("서버:", date);
-  if (queryResponse.results.length > 0) {
-    return queryResponse.results.length; // 해당 날짜에 이미 데이터가 있다면, 그 수를 반환
-  }
+  //console.log(startDate, endDate);
+  //const queryResponse = await notion.databases.query({
+    //database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
+    //filter: {
+      //and: [
+        //{
+          //property: "Name",
+          //title: {
+            //equals: user,
+          //},
+        //},
+        //{
+          //property: "날짜",
+          //date: {
+            //on_or_after: startDate,
+          //},
+        //},
+        //{
+          //property: "상태",
+          //status: {
+            //equals: "출근",
+          //},
+        //},
+      //],
+    //},
+  //});
+  //console.log("서버:", date);
+  //if (queryResponse.results.length > 0) {
+    //return queryResponse.results.length; // 해당 날짜에 이미 데이터가 있다면, 그 수를 반환
+  //}
   try {
     const response = await notion.pages.create({
       parent: { database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID },
