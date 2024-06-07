@@ -4,6 +4,8 @@ const authorData = {
   박경호: { name: "박경호", color: "gray" },
   이광렬: { name: "이광렬", color: "orange" },
   정태현: { name: "정태현", color: "green" },
+  이종원: { name: "이종원", color: "red" },
+  조문근: { name: "조문근", color: "brown" },
 };
 
 const bugData = {
