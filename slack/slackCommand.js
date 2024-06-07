@@ -119,6 +119,22 @@ function setupSlackCommands() {
                     },
                     value: "정태현",
                   },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "이종원",
+                      emoji: true,
+                    },
+                    value: "이종원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "조문근",
+                      emoji: true,
+                    },
+                    value: "조문근",
+                  },
                 ],
                 action_id: "author_select-action",
               },
