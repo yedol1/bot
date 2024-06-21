@@ -1,6 +1,47 @@
 const { notion } = require("../config");
-const { authorData, bugData } = require("../data");
+const { authorData, bugData, member } = require("../data");
 const { getSeoulDateISOString } = require("../utils");
+
+async function addStatusBoardListToDatabase(boardTitle, priority, attendees) {
+  try {
+    const people = attendees.map((attendee) => ({
+      name: member[attendee].name,
+    }));
+    console.log(people);
+
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_STATUS_BOARD_DATABASE_ID },
+      properties: {
+        // 제목 속성 유형은 제목입니다.
+        제목: {
+          title: [
+            {
+              text: {
+                content: boardTitle,
+              },
+            },
+          ],
+        },
+        // 우선순위 속성 유형은 단일 선택입니다.
+        우선순위: {
+          select: {
+            name: priority,
+          },
+        },
+        // 참여자 속성 유형은 다중 선택입니다.
+        담당자: {
+          multi_select: people.map((person) => ({
+            name: person.name,
+          })),
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
 
 async function addItemToVacationDatabase(user, startDate, endDate, totalVacationDays) {
   try {
@@ -54,33 +95,33 @@ async function checkInAttendanceDatabase(user, location, date) {
 
   //console.log(startDate, endDate);
   //const queryResponse = await notion.databases.query({
-    //database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
-    //filter: {
-      //and: [
-        //{
-          //property: "Name",
-          //title: {
-            //equals: user,
-          //},
-        //},
-        //{
-          //property: "날짜",
-          //date: {
-            //on_or_after: startDate,
-          //},
-        //},
-        //{
-          //property: "상태",
-          //status: {
-            //equals: "출근",
-          //},
-        //},
-      //],
-    //},
+  //database_id: process.env.NOTION_ATTENDANCE_DATABASE_ID,
+  //filter: {
+  //and: [
+  //{
+  //property: "Name",
+  //title: {
+  //equals: user,
+  //},
+  //},
+  //{
+  //property: "날짜",
+  //date: {
+  //on_or_after: startDate,
+  //},
+  //},
+  //{
+  //property: "상태",
+  //status: {
+  //equals: "출근",
+  //},
+  //},
+  //],
+  //},
   //});
   //console.log("서버:", date);
   //if (queryResponse.results.length > 0) {
-    //return queryResponse.results.length; // 해당 날짜에 이미 데이터가 있다면, 그 수를 반환
+  //return queryResponse.results.length; // 해당 날짜에 이미 데이터가 있다면, 그 수를 반환
   //}
   try {
     const response = await notion.pages.create({
@@ -326,4 +367,5 @@ module.exports = {
   addItemToDatabase,
   addItemToVacationDatabase,
   updateAttendanceDatabase,
+  addStatusBoardListToDatabase,
 };

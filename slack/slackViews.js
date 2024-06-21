@@ -1,8 +1,42 @@
 const { app } = require("../config");
-const { addItemToDatabase, addItemToVacationDatabase, checkInAttendanceDatabase, checkOutAttendanceDatabase, updateAttendanceDatabase } = require("../notion/notionAPI");
+const { addItemToDatabase, addItemToVacationDatabase, checkInAttendanceDatabase, checkOutAttendanceDatabase, addStatusBoardListToDatabase } = require("../notion/notionAPI");
 const { getSeoulDateISOString } = require("../utils");
+// values {
+//   board_title: { 'board_title-action': { type: 'plain_text_input', value: 'test' } },
+//   priority_select: {
+//     'priority_select-action': { type: 'static_select', selected_option: [Object] }
+//   },
+//   attendees_select: {
+//     'attendees_select-action': { type: 'multi_users_select', selected_users: [Array] }
+//   }
+// }
+async function setupSlackViews() {
+  app.view("uploadBoardList", async ({ ack, body, view, client }) => {
+    await ack();
 
-function setupSlackViews() {
+    const channelID = view?.private_metadata;
+    const values = view?.state?.values;
+    const info = values?.attendees_select;
+    const selectedUsers = info?.["attendees_select-action"]?.selected_users || [];
+    const boardTitle = values?.board_title?.["board_title-action"]?.value || "게시판 제목 없음";
+    const priority = values?.priority_select?.["priority_select-action"]?.selected_option?.text?.text || "우선순위 없음";
+
+    try {
+      const notionData = await addStatusBoardListToDatabase(boardTitle, priority, selectedUsers);
+      if (notionData) {
+        const messageText = `📝 [리스트] *${boardTitle}* \n\n*🔖 우선순위:* ${priority}\n\n*👥 참여자:* ${selectedUsers?.map((user) => `<@${user}>`).join(", ")} \n\n*📎 링크:* ${
+          notionData?.url
+        }\n\n( ⚠️ 링크로 들어가 나머지 속성을 추가하여 주세요. )`;
+        await client.chat.postMessage({
+          channel: channelID,
+          text: messageText,
+        });
+      }
+    } catch (error) {
+      console.error("메시지 전송 실패:", error);
+    }
+  });
+
   app.view("checkIn", async ({ ack, body, view, client }) => {
     await ack();
     const channelID = view.private_metadata;

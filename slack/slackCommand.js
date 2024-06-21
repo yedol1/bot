@@ -1,6 +1,128 @@
 const { app } = require("../config");
 
 function setupSlackCommands() {
+  app.command("/list", async ({ ack, body, client, payload }) => {
+    await ack();
+    try {
+      const res = await client.views.open({
+        trigger_id: payload.trigger_id,
+        view: {
+          type: "modal",
+          callback_id: "uploadBoardList",
+          private_metadata: body.channel_id,
+          close: {
+            type: "plain_text",
+            text: "Cancel",
+          },
+          title: {
+            type: "plain_text",
+            text: "Status board",
+          },
+          blocks: [
+            {
+              type: "context",
+              elements: [
+                {
+                  type: "plain_text",
+                  text: "Status board",
+                  emoji: true,
+                },
+              ],
+            },
+            {
+              type: "input",
+              block_id: "board_title",
+              element: {
+                type: "plain_text_input",
+                action_id: "board_title-action",
+              },
+              label: {
+                type: "plain_text",
+                text: "의논할 주제",
+                emoji: true,
+              },
+            },
+            {
+              type: "section",
+              block_id: "priority_select",
+              text: {
+                type: "mrkdwn",
+                text: "우선순위",
+              },
+              accessory: {
+                type: "static_select",
+                placeholder: {
+                  type: "plain_text",
+                  text: "선택하기",
+                  emoji: true,
+                },
+                options: [
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "1순위",
+                      emoji: true,
+                    },
+                    value: "1순위",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "2순위",
+                      emoji: true,
+                    },
+                    value: "2순위",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "3순위",
+                      emoji: true,
+                    },
+                    value: "3순위",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "그외",
+                      emoji: true,
+                    },
+                    value: "그외",
+                  },
+                ],
+                action_id: "priority_select-action",
+              },
+            },
+            // 참석자 다중선택
+            {
+              type: "section",
+              block_id: "attendees_select",
+              text: {
+                type: "mrkdwn",
+                text: "참석자",
+              },
+              accessory: {
+                type: "multi_users_select",
+                placeholder: {
+                  type: "plain_text",
+                  text: "선택하기",
+                  emoji: true,
+                },
+                action_id: "attendees_select-action",
+              },
+            },
+          ],
+          submit: {
+            type: "plain_text",
+            text: "Submit",
+          },
+        },
+      });
+      console.log("Modal opened:", res);
+    } catch (error) {
+      console.error("슬랙 창 열기 실패:", error);
+    }
+  });
   app.command("/qa-add", async ({ body, ack, client }) => {
     // Acknowledge the action
     await ack();
