@@ -2,6 +2,99 @@ const { notion } = require("../config");
 const { authorData, bugData, member } = require("../data");
 const { getSeoulDateISOString } = require("../utils");
 
+async function addSolPlannerMeetingToDatabase() {
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_S_PLANNER_MEETING_DATABASE_ID },
+      properties: {
+        // Name 속성 유형은 제목입니다.
+        제목: {
+          title: [
+            {
+              text: {
+                content: "솔루션팀 기획파트 회의록",
+              },
+            },
+          ],
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
+async function addSolAIDeveloperMeetingToDatabase() {
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_S_AI_DEVELOPER_MEETING_DATABASE_ID },
+      properties: {
+        // Name 속성 유형은 제목입니다.
+        제목: {
+          title: [
+            {
+              text: {
+                content: "솔루션팀 AI 개발파트 회의록",
+              },
+            },
+          ],
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
+async function addSolDeveloperMeetingToDatabase() {
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_S_DEVELOPER_MEETING_DATABASE_ID },
+      properties: {
+        // Name 속성 유형은 제목입니다.
+        제목: {
+          title: [
+            {
+              text: {
+                content: "솔루션팀 웹 개발파트 회의록",
+              },
+            },
+          ],
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
+async function addSolutionTeamMeetingToDatabase() {
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_SOLUTION_MEETING_DATABASE_ID },
+      properties: {
+        // Name 속성 유형은 제목입니다.
+        제목: {
+          title: [
+            {
+              text: {
+                content: "솔루션팀 회의록",
+              },
+            },
+          ],
+        },
+      },
+    });
+    console.log("Notion에 데이터가 추가되었습니다:", response);
+    return response;
+  } catch (error) {
+    console.error("Notion 데이터 추가 실패:", error);
+  }
+}
+
 async function addStatusBoardListToDatabase(boardTitle, priority, attendees) {
   try {
     const people = attendees.map((attendee) => ({
@@ -368,4 +461,8 @@ module.exports = {
   addItemToVacationDatabase,
   updateAttendanceDatabase,
   addStatusBoardListToDatabase,
+  addSolutionTeamMeetingToDatabase,
+  addSolDeveloperMeetingToDatabase,
+  addSolAIDeveloperMeetingToDatabase,
+  addSolPlannerMeetingToDatabase,
 };

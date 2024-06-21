@@ -1,6 +1,75 @@
 const { app } = require("../config");
+const { addSolutionTeamMeetingToDatabase, addSolDeveloperMeetingToDatabase, addSolAIDeveloperMeetingToDatabase, addSolPlannerMeetingToDatabase } = require("../notion/notionAPI");
 
 function setupSlackCommands() {
+  app.command("/add-solution-meeting", async ({ ack, body, client }) => {
+    await ack();
+
+    const channelID = body.channel_id;
+    try {
+      const notionData = await addSolutionTeamMeetingToDatabase();
+      if (notionData) {
+        const messageText = `*[ 📂 솔루션팀 회의록이 생성되었습니다. ]*\n\n\n*📎 링크*: ${notionData?.url}\n\n*⚠️ 링크에 접근하여, 페이지에 들어간후 [미팅 템플릿]을 클릭하여주세요.`;
+        await client.chat.postMessage({
+          channel: channelID,
+          text: messageText,
+        });
+      }
+    } catch (error) {
+      console.error("Notion 데이터 추가 실패:", error);
+    }
+  });
+  app.command("/add-s-developer-meeting", async ({ ack, body, client }) => {
+    await ack();
+
+    const channelID = body.channel_id;
+    try {
+      const notionData = await addSolDeveloperMeetingToDatabase();
+      if (notionData) {
+        const messageText = `*[ 📂 솔루션팀 웹 개발파트 회의록이 생성되었습니다. ]*\n\n\n*📎 링크*: ${notionData?.url}\n\n*⚠️ 링크에 접근하여, 페이지에 들어간후 [미팅 템플릿]을 클릭하여주세요.`;
+        await client.chat.postMessage({
+          channel: channelID,
+          text: messageText,
+        });
+      }
+    } catch (error) {
+      console.error("Notion 데이터 추가 실패:", error);
+    }
+  });
+  app.command("/add-s-ai-developer-meeting", async ({ ack, body, client }) => {
+    await ack();
+
+    const channelID = body.channel_id;
+    try {
+      const notionData = await addSolAIDeveloperMeetingToDatabase();
+      if (notionData) {
+        const messageText = `*[ 📂 솔루션팀 AI 개발파트 회의록이 생성되었습니다. ]*\n\n\n*📎 링크*: ${notionData?.url}\n\n*⚠️ 링크에 접근하여, 페이지에 들어간후 [미팅 템플릿]을 클릭하여주세요.`;
+        await client.chat.postMessage({
+          channel: channelID,
+          text: messageText,
+        });
+      }
+    } catch (error) {
+      console.error("Notion 데이터 추가 실패:", error);
+    }
+  });
+  app.command("/add-s-planner-meeting", async ({ ack, body, client }) => {
+    await ack();
+
+    const channelID = body.channel_id;
+    try {
+      const notionData = await addSolPlannerMeetingToDatabase();
+      if (notionData) {
+        const messageText = `*[ 📂 솔루션팀 기획파트 회의록이 생성되었습니다. ]*\n\n\n*📎 링크*: ${notionData?.url}\n\n*⚠️ 링크에 접근하여, 페이지에 들어간후 [미팅 템플릿]을 클릭하여주세요.`;
+        await client.chat.postMessage({
+          channel: channelID,
+          text: messageText,
+        });
+      }
+    } catch (error) {
+      console.error("Notion 데이터 추가 실패:", error);
+    }
+  });
   app.command("/list", async ({ ack, body, client, payload }) => {
     await ack();
     try {
