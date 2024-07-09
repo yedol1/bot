@@ -557,6 +557,14 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
+                      text: "유도원",
+                      emoji: true,
+                    },
+                    value: "유도원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
                       text: "test",
                       emoji: true,
                     },
