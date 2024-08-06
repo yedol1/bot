@@ -326,6 +326,14 @@ function setupSlackCommands() {
                     },
                     value: "조문근",
                   },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "현재식",
+                      emoji: true,
+                    },
+                    value: "현재식",
+                  },
                 ],
                 action_id: "author_select-action",
               },
@@ -565,6 +573,14 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
+                      text: "현재식",
+                      emoji: true,
+                    },
+                    value: "현재식",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
                       text: "test",
                       emoji: true,
                     },
@@ -738,6 +754,14 @@ function setupSlackCommands() {
                       emoji: true,
                     },
                     value: "유도원",
+                  },
+                  {
+                    text: {
+                      type: "plain_text",
+                      text: "현재식",
+                      emoji: true,
+                    },
+                    value: "현재식",
                   },
                   {
                     text: {
