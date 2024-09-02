@@ -1,6 +1,6 @@
 const authorData = {
   강인해: { name: "강인해", color: "purple" },
-  김재호: { name: "김재호", color: "blue" },
+  양진영: { name: "양진영", color: "blue" },
   박경호: { name: "박경호", color: "gray" },
   이광렬: { name: "이광렬", color: "orange" },
   정태현: { name: "정태현", color: "green" },
@@ -16,14 +16,14 @@ const bugData = {
 
 const developer = {
   U066HPC6GAG: "이광렬",
-  U042RS7CBU6: "김재호",
+  U07K1MGDRQF: "양진영",
   U05CWRU2K60: "정태현",
   U06RYHLNK2S: "이종원",
   U06S7LJ7L8L: "조문근",
 };
 const member = {
   U066HPC6GAG: { name: "이광렬", color: "orange" },
-  U042RS7CBU6: { name: "김재호", color: "blue" },
+  U07K1MGDRQF: { name: "양진영", color: "blue" },
   U05CWRU2K60: { name: "정태현", color: "green" },
   U042VFX4WMB: { name: "강인해", color: "purple" },
   U0430TP80SG: { name: "박경호", color: "gray" },

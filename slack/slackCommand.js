@@ -297,10 +297,10 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
-                      text: "김재호",
+                      text: "양진영",
                       emoji: true,
                     },
-                    value: "김재호",
+                    value: "양진영",
                   },
                   {
                     text: {
@@ -364,7 +364,7 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
-                      text: "김재호",
+                      text: "양진영",
                       emoji: true,
                     },
                     value: "U042RS7CBU6",
@@ -509,10 +509,10 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
-                      text: "김재호",
+                      text: "양진영",
                       emoji: true,
                     },
-                    value: "김재호",
+                    value: "양진영",
                   },
                   {
                     text: {
@@ -694,10 +694,10 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
-                      text: "김재호",
+                      text: "양진영",
                       emoji: true,
                     },
-                    value: "김재호",
+                    value: "양진영",
                   },
                   {
                     text: {
@@ -910,10 +910,10 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
-                      text: "김재호",
+                      text: "양진영",
                       emoji: true,
                     },
-                    value: "김재호",
+                    value: "양진영",
                   },
                   {
                     text: {
@@ -1129,10 +1129,10 @@ function setupSlackCommands() {
                   {
                     text: {
                       type: "plain_text",
-                      text: "김재호",
+                      text: "양진영",
                       emoji: true,
                     },
-                    value: "김재호",
+                    value: "양진영",
                   },
                   {
                     text: {
